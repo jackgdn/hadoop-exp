@@ -37,35 +37,3 @@ public class Sort {
         System.exit(job.waitForCompletion(true) ? 0 : 1);
     }
 }
-
-class SortMapper extends Mapper<LongWritable, Text, NullWritable, IntWritable> {
-    private IntWritable num = new IntWritable();
-
-    @Override
-    protected void map(LongWritable key, Text value, Context context) throws IOException, InterruptedException {
-        try {
-            int number = Integer.parseInt(value.toString());
-            num.set(number);
-            context.write(NullWritable.get(), num);
-        } catch (NumberFormatException e) {
-            System.err.println("Invalid input: " + value.toString());
-        }
-    }
-}
-
-class SortReducer extends Reducer<NullWritable, IntWritable, IntWritable, IntWritable> {
-    private List<Integer> numbers = new ArrayList<>();
-
-    @Override
-    protected void reduce(NullWritable key, Iterable<IntWritable> values, Context context)
-            throws IOException, InterruptedException {
-        for (IntWritable value : values) {
-            numbers.add(value.get());
-        }
-        Collections.sort(numbers);
-        int index = 1;
-        for (int num : numbers) {
-            context.write(new IntWritable(index++), new IntWritable(num));
-        }
-    }
-}

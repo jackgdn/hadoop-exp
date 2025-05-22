@@ -36,33 +36,3 @@ public class WordCount {
         System.exit(job.waitForCompletion(true) ? 0 : 1);
     }
 }
-
-class WordCountMapper extends Mapper<LongWritable, Text, Text, IntWritable> {
-    private final static IntWritable one = new IntWritable(1);
-    private Text word = new Text();
-
-    @Override
-    protected void map(LongWritable key, Text value, Context context) throws IOException, InterruptedException {
-        String line = value.toString();
-        String[] words = line.split("\\s+");
-        for (String w : words) {
-            word.set(w);
-            context.write(word, one);
-        }
-    }
-}
-
-class WordCountReducer extends Reducer<Text, IntWritable, Text, IntWritable> {
-    private IntWritable result = new IntWritable();
-
-    @Override
-    protected void reduce(Text key, Iterable<IntWritable> values, Context context)
-            throws IOException, InterruptedException {
-        int sum = 0;
-        for (IntWritable val : values) {
-            sum += val.get();
-        }
-        result.set(sum);
-        context.write(key, result);
-    }
-}
